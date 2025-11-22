@@ -1,12 +1,14 @@
 "use client"
 
-import { Button } from "@/components/ui/button"
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
-import { Kbd, KbdGroup } from "@/components/ui/kbd"
-import { Bold, Italic, Code, Link, List, ListOrdered, Quote, Heading } from "lucide-react"
-import { useState, useEffect } from "react"
 import type React from "react"
+import { useState, useEffect } from "react"
+
+import { Button } from "@/components/ui/button"
+import { Kbd, KbdGroup } from "@/components/ui/kbd"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
+
 import { useMediaQuery } from "@/hooks/use-media-query"
+import { Bold, Italic, Code, Link, List, ListOrdered, Quote, Heading } from "lucide-react"
 
 interface ToolbarProps {
   textareaRef: React.RefObject<HTMLTextAreaElement | null>
