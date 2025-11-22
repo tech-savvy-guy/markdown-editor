@@ -6,7 +6,7 @@ import { useCallback } from "react"
 
 interface KeyboardShortcutsProps {
   markdown: string
-  textareaRef: React.RefObject<HTMLTextAreaElement>
+  textareaRef: React.RefObject<HTMLTextAreaElement | null>
   insertMarkdown: (prefix: string, suffix?: string) => void
   handleUndo: () => void
   handleRedo: () => void

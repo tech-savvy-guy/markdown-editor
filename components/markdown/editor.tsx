@@ -1,51 +1,35 @@
 "use client"
 
 import type React from "react"
+import { useRef, useCallback } from "react"
+import { EditorContent } from "@/components/markdown/content"
+import { useEditorHistory } from "@/hooks/use-editor-history"
+import { useCursorPosition } from "@/hooks/use-cursor-position"
 
-import { useState, useEffect, useRef, useCallback } from "react"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { cn } from "@/lib/utils"
-import { EditorToolbar } from "./editor-toolbar"
-import { EditorContent } from "./editor-content"
-import { MarkdownPreview } from "./markdown-preview"
-import { EditorFooter } from "./editor-footer"
-import { useMarkdownState } from "./hooks/use-markdown-state"
-import { useEditorHistory } from "./hooks/use-editor-history"
-import { useCursorPosition } from "./hooks/use-cursor-position"
+interface EditorProps {
+  markdown: string
+  setMarkdown: (value: string) => void
+  setIsSaved: (value: boolean) => void
+  selectedText: { text: string; start: number; end: number }
+  setSelectedText: (selection: { text: string; start: number; end: number }) => void
+}
 
-export default function MarkdownEditor() {
-  const [activeTab, setActiveTab] = useState<string>("write")
-  const [showNumberingTip, setShowNumberingTip] = useState(false)
-  const [copied, setCopied] = useState(false)
+export function Editor({
+  markdown,
+  setMarkdown,
+  setIsSaved,
+  selectedText,
+  setSelectedText,
+}: EditorProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
-  // Custom hooks for state management
-  const { markdown, setMarkdown, previewContent, isSaved, setIsSaved, selectedText, setSelectedText } =
-    useMarkdownState()
-
-  const { history, historyIndex, addToHistory, handleUndo, handleRedo } = useEditorHistory(
+  const { addToHistory, handleUndo, handleRedo } = useEditorHistory(
     markdown,
     setMarkdown,
     setIsSaved,
   )
 
-  const { cursorPosition, updateCursorPosition } = useCursorPosition(textareaRef)
-
-  // Load saved view mode preference
-
-  // Add beforeunload event listener to warn about unsaved changes
-  useEffect(() => {
-    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      if (!isSaved) {
-        e.preventDefault()
-        e.returnValue = ""
-        return ""
-      }
-    }
-
-    window.addEventListener("beforeunload", handleBeforeUnload)
-    return () => window.removeEventListener("beforeunload", handleBeforeUnload)
-  }, [isSaved])
+  const { updateCursorPosition } = useCursorPosition(textareaRef)
 
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -106,21 +90,22 @@ export default function MarkdownEditor() {
         textarea.focus()
 
         if (text.length > 0) {
-          // If text was selected, place cursor after the selection + suffix
-          textarea.setSelectionRange(
-            start + prefix.length + text.length + suffix.length,
-            start + prefix.length + text.length + suffix.length,
-          )
+          // If text was selected, keep only the original text selected (not the prefix/suffix)
+          const newStart = start + prefix.length
+          const newEnd = start + prefix.length + text.length
+          textarea.setSelectionRange(newStart, newEnd)
+          
+          // Update selectedText to reflect the new selection (original text only)
+          setSelectedText({ text: text, start: newStart, end: newEnd })
         } else {
           // If no text was selected, place cursor between prefix and suffix
           textarea.setSelectionRange(start + prefix.length, start + prefix.length)
+          setSelectedText({ text: "", start: 0, end: 0 })
         }
 
         // Restore scroll position
         textarea.scrollTop = scrollTop
 
-        // Clear the stored selection
-        setSelectedText({ text: "", start: 0, end: 0 })
         updateCursorPosition()
       }, 0)
     },
@@ -160,84 +145,21 @@ export default function MarkdownEditor() {
     setIsSaved(true)
   }, [markdown, setIsSaved])
 
-  const copyToClipboard = useCallback(() => {
-    navigator.clipboard.writeText(markdown).then(() => {
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
-    })
-  }, [markdown])
-
-  const showTip = useCallback(() => {
-    setShowNumberingTip(true)
-    setTimeout(() => setShowNumberingTip(false), 5000)
-  }, [])
-
   return (
-    <div className="border rounded-lg shadow-sm bg-card text-card-foreground overflow-hidden">
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        {/* Make the toolbar sticky */}
-        <div className="sticky top-0 z-10 bg-card border-b shadow-sm">
-          <div className="flex items-center">
-            <TabsList className="bg-transparent border-b-0 h-12 px-4">
-              <TabsTrigger
-                value="write"
-                className={cn(
-                  "data-[state=active]:bg-transparent data-[state=active]:shadow-none rounded-none border-b-2 border-transparent data-[state=active]:border-primary px-4 font-medium",
-                  "text-muted-foreground data-[state=active]:text-primary",
-                )}
-              >
-                Write
-              </TabsTrigger>
-              <TabsTrigger
-                value="preview"
-                className={cn(
-                  "data-[state=active]:bg-transparent data-[state=active]:shadow-none rounded-none border-b-2 border-transparent data-[state=active]:border-primary px-4 font-medium",
-                  "text-muted-foreground data-[state=active]:text-primary",
-                )}
-              >
-                Preview
-              </TabsTrigger>
-            </TabsList>
-
-            <EditorToolbar
-              insertMarkdown={insertMarkdown}
-              handleUndo={handleUndo}
-              handleRedo={handleRedo}
-              saveContent={saveContent}
-              copyToClipboard={copyToClipboard}
-              showTip={showTip}
-              copied={copied}
-              isSaved={isSaved}
-              historyIndex={historyIndex}
-              historyLength={history.length}
-            />
-          </div>
-        </div>
-
-        <div className="relative">
-          <TabsContent value="write" className="p-0 m-0 relative">
-            <EditorContent
-              textareaRef={textareaRef}
-              markdown={markdown}
-              handleChange={handleChange}
-              updateCursorPosition={updateCursorPosition}
-              setSelectedText={setSelectedText}
-              insertMarkdown={insertMarkdown}
-              handleUndo={handleUndo}
-              handleRedo={handleRedo}
-              saveContent={saveContent}
-              showTip={showTip}
-              showNumberingTip={showNumberingTip}
-              updateMarkdownContent={updateMarkdownContent}
-            />
-          </TabsContent>
-          <TabsContent value="preview" className="p-0 m-0">
-            <MarkdownPreview content={previewContent} />
-          </TabsContent>
-        </div>
-      </Tabs>
-
-      <EditorFooter isSaved={isSaved} cursorPosition={cursorPosition} />
-    </div>
+    <EditorContent
+      textareaRef={textareaRef}
+      markdown={markdown}
+      handleChange={handleChange}
+      updateCursorPosition={updateCursorPosition}
+      selectedText={selectedText}
+      setSelectedText={setSelectedText}
+      insertMarkdown={insertMarkdown}
+      handleUndo={handleUndo}
+      handleRedo={handleRedo}
+      saveContent={saveContent}
+      showTip={() => {}}
+      showNumberingTip={false}
+      updateMarkdownContent={updateMarkdownContent}
+    />
   )
 }

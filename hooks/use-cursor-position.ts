@@ -4,7 +4,7 @@ import type React from "react"
 
 import { useState, useCallback } from "react"
 
-export function useCursorPosition(textareaRef: React.RefObject<HTMLTextAreaElement>) {
+export function useCursorPosition(textareaRef: React.RefObject<HTMLTextAreaElement | null>) {
   const [cursorPosition, setCursorPosition] = useState({ line: 1, column: 1 })
 
   const updateCursorPosition = useCallback(() => {

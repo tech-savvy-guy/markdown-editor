@@ -3,36 +3,23 @@
 import type React from "react"
 import {
   ContextMenu,
-  ContextMenuContent,
   ContextMenuItem,
-  ContextMenuSeparator,
   ContextMenuTrigger,
+  ContextMenuContent,
   ContextMenuShortcut,
+  ContextMenuSeparator,
 } from "@/components/ui/context-menu"
-import {
-  Info,
-  Bold,
-  Italic,
-  Code,
-  Link2,
-  ImageIcon,
-  Heading,
-  Quote,
-  List,
-  ListOrdered,
-  Table,
-  Save,
-  Undo,
-  Redo,
-  Strikethrough,
-} from "lucide-react"
-import { useEditorKeyboardShortcuts } from "./hooks/use-editor-keyboard-shortcuts"
+import { Toolbar } from "@/components/markdown/toolbar"
+
+import { useEditorKeyboardShortcuts } from "@/hooks/use-editor-keyboard-shortcuts"
+import { Bold, Italic, Code, Link2, ImageIcon, Heading, Quote, List, ListOrdered, Table, Save, Undo, Redo, Strikethrough } from "lucide-react"
 
 interface EditorContentProps {
-  textareaRef: React.RefObject<HTMLTextAreaElement>
+  textareaRef: React.RefObject<HTMLTextAreaElement | null>
   markdown: string
   handleChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void
   updateCursorPosition: () => void
+  selectedText: { text: string; start: number; end: number }
   setSelectedText: (selection: { text: string; start: number; end: number }) => void
   insertMarkdown: (prefix: string, suffix?: string) => void
   handleUndo: () => void
@@ -48,6 +35,7 @@ export function EditorContent({
   markdown,
   handleChange,
   updateCursorPosition,
+  selectedText,
   setSelectedText,
   insertMarkdown,
   handleUndo,
@@ -57,6 +45,7 @@ export function EditorContent({
   showNumberingTip,
   updateMarkdownContent,
 }: EditorContentProps) {
+
   const handleKeyDown = useEditorKeyboardShortcuts({
     markdown,
     textareaRef,
@@ -81,6 +70,10 @@ export function EditorContent({
       setSelectedText({ text, start, end })
     }
 
+    updateCursorPosition()
+  }
+
+  const handleSelect = () => {
     updateCursorPosition()
   }
 
@@ -144,9 +137,9 @@ export function EditorContent({
             onChange={handleChange}
             onKeyDown={handleKeyDown}
             onMouseUp={handleMouseUp}
-            onSelect={updateCursorPosition}
-            className="w-full min-h-[400px] p-4 font-mono text-sm bg-transparent border-0 focus:ring-0 focus:outline-none resize-none text-foreground"
-            placeholder="Add your markdown here..."
+            onSelect={handleSelect}
+            className="w-full h-full p-8 pb-20 font-mono text-sm bg-transparent border-0 focus:ring-0 focus:outline-none resize-none text-foreground scrollbar-minimal"
+            placeholder="Start writing..."
             aria-label="Markdown editor"
             spellCheck="false"
           />
@@ -254,7 +247,7 @@ export function EditorContent({
             className="flex items-center gap-2"
           >
             <ListOrdered size={16} />
-            <span>Numbered List</span>
+            <span>Num List</span>
             <ContextMenuShortcut>⌘O</ContextMenuShortcut>
           </ContextMenuItem>
           <ContextMenuItem onClick={() => handleContextMenuAction(insertTable)} className="flex items-center gap-2">
@@ -281,21 +274,13 @@ export function EditorContent({
         </ContextMenuContent>
       </ContextMenu>
 
-      {/* Automatic numbering tip */}
-      {showNumberingTip && (
-        <div className="absolute bottom-4 right-4 bg-primary/10 border border-primary/20 rounded-lg p-3 max-w-xs shadow-sm">
-          <div className="flex items-start gap-2">
-            <Info size={18} className="text-primary mt-0.5 flex-shrink-0" />
-            <div>
-              <p className="text-xs font-medium text-primary">Automatic Numbering</p>
-              <p className="text-xs text-muted-foreground mt-1">
-                Markdown supports automatic numbering. You can use "1." for all items and they'll be numbered correctly
-                in the preview.
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
+      <Toolbar
+        textareaRef={textareaRef}
+        insertMarkdown={insertMarkdown}
+        setSelectedText={setSelectedText}
+      />
     </div>
   )
 }
+
+

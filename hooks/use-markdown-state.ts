@@ -10,7 +10,7 @@ Start typing to see the preview update in real-time.
 
 - **Bold text** and *italic text*
 - [Links](https://nextjs.org)
-- Images ![alt text](/placeholder.svg?height=50&width=100&query=example)
+- Images ![alt text](/placeholder.svg)
 - Code blocks
 
 \`\`\`javascript
