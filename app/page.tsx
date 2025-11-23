@@ -80,9 +80,9 @@ export default function Home() {
         </>
       ) : (
         // Small screens: Tabs
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full h-full">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full h-full flex flex-col">
           {/* Header with theme toggle */}
-          <div className="flex items-center justify-center border-b border-border/40 relative">
+          <div className="flex items-center justify-center border-b border-border/40 relative flex-shrink-0">
             <TabsList className="bg-transparent border-0 h-10 px-2">
               <TabsTrigger
                 value="write"
@@ -107,7 +107,7 @@ export default function Home() {
           </div>
           {/* Content area */}
           <div className="relative flex-1 min-h-0">
-            <TabsContent value="write" className="p-0 m-0 relative h-full">
+            <TabsContent value="write" className="p-0 m-0 absolute inset-0">
               <Editor
                 markdown={markdown}
                 setMarkdown={setMarkdown}
@@ -116,7 +116,7 @@ export default function Home() {
                 setSelectedText={setSelectedText}
               />
             </TabsContent>
-            <TabsContent value="preview" className="p-0 m-0 h-full overflow-auto scrollbar-minimal">
+            <TabsContent value="preview" className="p-0 m-0 absolute inset-0 overflow-auto scrollbar-minimal">
               <MarkdownPreview content={previewContent} />
             </TabsContent>
           </div>
