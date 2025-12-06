@@ -1,7 +1,9 @@
 import "./globals.css"
 import "bootstrap-icons/font/bootstrap-icons.css"
+
 import type React from "react"
 import type { Metadata } from "next"
+import { Analytics } from "@vercel/analytics/next"
 import { Geist, Geist_Mono } from "next/font/google"
 import { ThemeProvider } from "@/components/theme-provider"
 
@@ -32,6 +34,7 @@ export default function RootLayout({
           <div className="flex flex-col h-screen overflow-hidden">
             <main className="flex-1 min-h-0">
               {children}
+              <Analytics />
             </main>
           </div>
         </ThemeProvider>
