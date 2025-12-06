@@ -8,7 +8,7 @@ import { Kbd, KbdGroup } from "@/components/ui/kbd"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 
 import { useMediaQuery } from "@/hooks/use-media-query"
-import { Bold, Italic, Code, Link, List, ListOrdered, Quote, Heading } from "lucide-react"
+import { Bold, Italic, Code, Link, List, ListOrdered, Heading } from "lucide-react"
 
 interface ToolbarProps {
   textareaRef: React.RefObject<HTMLTextAreaElement | null>
@@ -43,7 +43,6 @@ export function Toolbar({ textareaRef, insertMarkdown, setSelectedText }: Toolba
     [Heading, "## ", "", "Heading", "2"],
     [List, "- ", "", "List", "L"],
     [ListOrdered, "1. ", "", "Num List", "O"],
-    [Quote, "> ", "", "Quote", "Q"],
   ] as const
 
   return (

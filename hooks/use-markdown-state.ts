@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react"
 
-const DEFAULT_MARKDOWN = `# Hello, Markdown!
+const DEFAULT_MARKDOWN = `# Hello World!
 
 Start typing to see the preview update in real-time.
 
@@ -10,15 +10,12 @@ Start typing to see the preview update in real-time.
 
 - **Bold text** and *italic text*
 - [Links](https://nextjs.org)
-- Images ![alt text](/placeholder.svg)
 - Code blocks
 
 \`\`\`javascript
 const greeting = "Hello, world!";
 console.log(greeting);
 \`\`\`
-
-> Blockquotes are supported too
 
 1. Ordered lists
 2. Support automatic numbering

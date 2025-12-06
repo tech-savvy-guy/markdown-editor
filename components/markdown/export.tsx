@@ -28,7 +28,7 @@ export function ExportToolbar({ markdownContent, previewRef }: ExportToolbarProp
     { 
       icon: <PDFIcon />,
       title: "PDF File", 
-      onClick: () => exportToPDF(previewRef),
+      onClick: () => exportToPDF(previewRef, markdownContent),
     },
   ]
 
